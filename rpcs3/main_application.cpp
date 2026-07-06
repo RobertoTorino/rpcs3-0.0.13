@@ -14,7 +14,7 @@
 #include "Emu/Audio/AudioBackend.h"
 #include "Emu/Audio/Null/NullAudioBackend.h"
 #include "Emu/Audio/AL/OpenALBackend.h"
-#ifdef _WIN32
+#if defined(_WIN32) && __has_include(<xaudio2redist.h>)
 #include "Emu/Audio/XAudio2/XAudio2Backend.h"
 #endif
 #ifdef HAVE_ALSA
@@ -110,8 +110,10 @@ EmuCallbacks main_application::CreateCallbacks()
 		switch (audio_renderer type = g_cfg.audio.renderer)
 		{
 		case audio_renderer::null: result = std::make_shared<NullAudioBackend>(); break;
-#ifdef _WIN32
+#if defined(_WIN32) && __has_include(<xaudio2redist.h>)
 		case audio_renderer::xaudio: result = std::make_shared<XAudio2Backend>(); break;
+#elif defined(_WIN32)
+		case audio_renderer::xaudio: result = std::make_shared<NullAudioBackend>(); break;
 #endif
 #ifdef HAVE_ALSA
 		case audio_renderer::alsa: result = std::make_shared<ALSABackend>(); break;

@@ -1,6 +1,8 @@
 ﻿#pragma once
 
-#ifdef _WIN32
+#include <QtGlobal>
+
+#if defined(_WIN32) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QWinTHumbnailToolbar>
 #include <QWinTHumbnailToolbutton>
 #endif
@@ -50,7 +52,7 @@ class main_window : public QMainWindow
 	QIcon m_icon_fullscreen_on;
 	QIcon m_icon_fullscreen_off;
 
-#ifdef _WIN32
+#if defined(_WIN32) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	QIcon m_icon_thumb_play;
 	QIcon m_icon_thumb_pause;
 	QIcon m_icon_thumb_stop;
@@ -59,6 +61,9 @@ class main_window : public QMainWindow
 	QWinThumbnailToolButton *m_thumb_playPause = nullptr;
 	QWinThumbnailToolButton *m_thumb_stop = nullptr;
 	QWinThumbnailToolButton *m_thumb_restart = nullptr;
+#endif
+
+#ifdef _WIN32
 	QStringList m_vulkan_adapters;
 #endif
 

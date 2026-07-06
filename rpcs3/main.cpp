@@ -446,7 +446,9 @@ int main(int argc, char** argv)
 	if (auto gui_app = qobject_cast<gui_application*>(app.data()))
 	{
 		gui_app->setAttribute(Qt::AA_UseHighDpiPixmaps);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 		gui_app->setAttribute(Qt::AA_DisableWindowContextHelpButton);
+#endif
 		gui_app->setAttribute(Qt::AA_DontCheckOpenGLContextThreadAffinity);
 
 		gui_app->SetShowGui(!parser.isSet(arg_no_gui));

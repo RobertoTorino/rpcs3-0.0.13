@@ -32,7 +32,7 @@ namespace
 	QString FormatTimestamp(u64 time)
 	{
 		QDateTime dateTime;
-		dateTime.setTime_t(time);
+		dateTime.setSecsSinceEpoch(time);
 		return dateTime.toString("yyyy-MM-dd HH:mm:ss");
 	}
 

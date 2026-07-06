@@ -1113,7 +1113,11 @@ settings_dialog::settings_dialog(std::shared_ptr<gui_settings> gui_settings, std
 	};
 
 	// Events
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+	connect(lib_mode_bg, &QButtonGroup::idClicked, on_lib_button_clicked);
+#else
 	connect(lib_mode_bg, static_cast<void(QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), on_lib_button_clicked);
+#endif
 	connect(ui->searchBox, &QLineEdit::textChanged, on_search_box_text_changed);
 
 	// enable multiselection (there must be a better way)

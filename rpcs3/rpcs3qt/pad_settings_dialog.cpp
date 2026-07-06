@@ -222,7 +222,18 @@ pad_settings_dialog::pad_settings_dialog(std::shared_ptr<gui_settings> gui_setti
 	SubscribeTooltips();
 
 	// Repaint controller image
-	ui->l_controller->setPixmap(gui::utils::get_colorized_pixmap(*ui->l_controller->pixmap(), QColor(), gui::utils::get_label_color("l_controller"), false, true));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+	const QPixmap controller_pixmap = ui->l_controller->pixmap(Qt::ReturnByValue);
+	if (!controller_pixmap.isNull())
+	{
+		ui->l_controller->setPixmap(gui::utils::get_colorized_pixmap(controller_pixmap, QColor(), gui::utils::get_label_color("l_controller"), false, true));
+	}
+#else
+	if (const QPixmap* controller_pixmap = ui->l_controller->pixmap())
+	{
+		ui->l_controller->setPixmap(gui::utils::get_colorized_pixmap(*controller_pixmap, QColor(), gui::utils::get_label_color("l_controller"), false, true));
+	}
+#endif
 
 	// Show default widgets first in order to calculate the required size for the scroll area (see pad_settings_dialog::ResizeDialog)
 	ui->left_stack->setCurrentIndex(0);
@@ -301,7 +312,11 @@ void pad_settings_dialog::InitButtons()
 	m_padButtons->addButton(ui->b_refresh, button_ids::id_refresh);
 	m_padButtons->addButton(ui->b_addProfile, button_ids::id_add_profile);
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+	connect(m_padButtons, &QButtonGroup::idClicked, this, &pad_settings_dialog::OnPadButtonClicked);
+#else
 	connect(m_padButtons, static_cast<void(QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this, &pad_settings_dialog::OnPadButtonClicked);
+#endif
 
 	connect(&m_timer, &QTimer::timeout, [this]()
 	{

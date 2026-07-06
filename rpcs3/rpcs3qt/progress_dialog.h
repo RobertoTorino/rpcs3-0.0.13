@@ -2,7 +2,7 @@
 
 #include <QProgressDialog>
 
-#ifdef _WIN32
+#if defined(_WIN32) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QWinTaskbarProgress>
 #include <QWinTaskbarButton>
 #endif
@@ -16,7 +16,7 @@ public:
 	void SignalFailure();
 
 private:
-#ifdef _WIN32
+#if defined(_WIN32) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	std::unique_ptr<QWinTaskbarButton> m_tb_button = nullptr;
 	QWinTaskbarProgress* m_tb_progress = nullptr;
 #elif HAVE_QTDBUS

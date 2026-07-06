@@ -130,12 +130,19 @@ if(USE_FAUDIO AND SDL2_FOUND AND NOT SDL2_VERSION VERSION_LESS 2.0.9)
 endif()
 
 if(WIN32)
-	target_include_directories(rpcs3_emu PUBLIC "${RPCS3_SRC_DIR}/../3rdparty/XAudio2Redist/include")
-	target_link_libraries(rpcs3_emu PRIVATE "${RPCS3_SRC_DIR}/../3rdparty/XAudio2Redist/libs/xaudio2_9redist.lib")
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:xaudio2_9redist.dll")
-	target_sources(rpcs3_emu PRIVATE
-		Audio/XAudio2/XAudio2Backend.cpp
-	)
+	set(XAUDIO2_REDIST_INCLUDE_DIR "${RPCS3_SRC_DIR}/../3rdparty/XAudio2Redist/include")
+	set(XAUDIO2_REDIST_LIB "${RPCS3_SRC_DIR}/../3rdparty/XAudio2Redist/libs/xaudio2_9redist.lib")
+
+	if(EXISTS "${XAUDIO2_REDIST_LIB}")
+		target_include_directories(rpcs3_emu PUBLIC "${XAUDIO2_REDIST_INCLUDE_DIR}")
+		target_link_libraries(rpcs3_emu PRIVATE "${XAUDIO2_REDIST_LIB}")
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:xaudio2_9redist.dll")
+		target_sources(rpcs3_emu PRIVATE
+			Audio/XAudio2/XAudio2Backend.cpp
+		)
+	else()
+		message(WARNING "XAudio2Redist library was not found at '${XAUDIO2_REDIST_LIB}'. Building without XAudio2 backend.")
+	endif()
 endif()
 
 target_link_libraries(rpcs3_emu

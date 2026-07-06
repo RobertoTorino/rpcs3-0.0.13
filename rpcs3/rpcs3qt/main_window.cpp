@@ -35,6 +35,7 @@
 #include <QMimeData>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QRegularExpression>
 
 #include "rpcs3_version.h"
 #include "Emu/System.h"
@@ -147,7 +148,7 @@ void main_window::Init()
 	ui->toolbar_start->setEnabled(enable_play_last);
 
 	// create tool buttons for the taskbar thumbnail
-#ifdef _WIN32
+#if defined(_WIN32) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	m_thumb_bar = new QWinThumbnailToolBar(this);
 	m_thumb_bar->setWindow(windowHandle());
 
@@ -520,7 +521,7 @@ void main_window::InstallPackages(QStringList file_paths)
 	}
 
 	// Install rap files if available
-	for (const auto& rap : file_paths.filter(QRegExp(".*\\.rap")))
+	for (const auto& rap : file_paths.filter(QRegularExpression(".*\\.rap")))
 	{
 		const QFileInfo file_info(rap);
 		const std::string rapname = sstr(file_info.fileName());
@@ -538,7 +539,7 @@ void main_window::InstallPackages(QStringList file_paths)
 	}
 
 	// Find remaining package files
-	file_paths = file_paths.filter(QRegExp(".*\\.pkg", Qt::CaseInsensitive));
+	file_paths = file_paths.filter(QRegularExpression(".*\\.pkg", QRegularExpression::CaseInsensitiveOption));
 
 	if (file_paths.isEmpty())
 	{
@@ -952,7 +953,7 @@ void main_window::RepaintThumbnailIcons()
 		return gui::utils::get_colorized_icon(QPixmap::fromImage(gui::utils::get_opaque_image_area(path)), Qt::black, new_color);
 	};
 
-#ifdef _WIN32
+#if defined(_WIN32) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	if (!m_thumb_bar) return;
 
 	m_icon_thumb_play = icon(":/Icons/play.png");
@@ -1050,7 +1051,7 @@ void main_window::OnEmuRun(bool /*start_playtime*/)
 
 	m_debugger_frame->EnableButtons(true);
 
-#ifdef _WIN32
+#if defined(_WIN32) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	m_thumb_stop->setToolTip(stop_tooltip);
 	m_thumb_restart->setToolTip(restart_tooltip);
 	m_thumb_playPause->setToolTip(pause_tooltip);
@@ -1073,7 +1074,7 @@ void main_window::OnEmuResume()
 	const QString pause_tooltip = tr("Pause %0").arg(title);
 	const QString stop_tooltip = tr("Stop %0").arg(title);
 
-#ifdef _WIN32
+#if defined(_WIN32) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	m_thumb_stop->setToolTip(stop_tooltip);
 	m_thumb_restart->setToolTip(restart_tooltip);
 	m_thumb_playPause->setToolTip(pause_tooltip);
@@ -1092,7 +1093,7 @@ void main_window::OnEmuPause()
 	const QString title = GetCurrentTitle();
 	const QString resume_tooltip = tr("Resume %0").arg(title);
 
-#ifdef _WIN32
+#if defined(_WIN32) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	m_thumb_playPause->setToolTip(resume_tooltip);
 	m_thumb_playPause->setIcon(m_icon_thumb_play);
 #endif
@@ -1121,7 +1122,7 @@ void main_window::OnEmuStop()
 
 	ui->sysPauseAct->setText(Emu.IsReady() ? tr("&Play\tCtrl+E") : tr("&Resume\tCtrl+E"));
 	ui->sysPauseAct->setIcon(m_icon_play);
-#ifdef _WIN32
+#if defined(_WIN32) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	m_thumb_playPause->setToolTip(play_tooltip);
 	m_thumb_playPause->setIcon(m_icon_thumb_play);
 #endif
@@ -1141,7 +1142,7 @@ void main_window::OnEmuStop()
 		ui->toolbar_start->setText(tr("Restart"));
 		ui->toolbar_start->setToolTip(restart_tooltip);
 		ui->sysRebootAct->setEnabled(true);
-#ifdef _WIN32
+#if defined(_WIN32) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 		m_thumb_restart->setToolTip(restart_tooltip);
 		m_thumb_restart->setEnabled(true);
 #endif
@@ -1161,7 +1162,7 @@ void main_window::OnEmuReady()
 	const QString play_tooltip = Emu.IsReady() ? tr("Play %0").arg(title) : tr("Resume %0").arg(title);
 
 	m_debugger_frame->EnableButtons(true);
-#ifdef _WIN32
+#if defined(_WIN32) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	m_thumb_playPause->setToolTip(play_tooltip);
 	m_thumb_playPause->setIcon(m_icon_thumb_play);
 #endif
@@ -1179,7 +1180,7 @@ void main_window::OnEmuReady()
 void main_window::EnableMenus(bool enabled)
 {
 	// Thumbnail Buttons
-#ifdef _WIN32
+#if defined(_WIN32) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	m_thumb_playPause->setEnabled(enabled);
 	m_thumb_stop->setEnabled(enabled);
 	m_thumb_restart->setEnabled(enabled);
@@ -1980,14 +1981,14 @@ void main_window::CreateDockWindows()
 
 			ui->toolbar_start->setEnabled(enable_play_buttons);
 			ui->sysPauseAct->setEnabled(enable_play_buttons);
-#ifdef _WIN32
+#if defined(_WIN32) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 			m_thumb_playPause->setEnabled(enable_play_buttons);
 #endif
 
 			if (!tooltip.isEmpty())
 			{
 				ui->toolbar_start->setToolTip(tooltip);
-#ifdef _WIN32
+#if defined(_WIN32) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 				m_thumb_playPause->setToolTip(tooltip);
 #endif
 			}
@@ -2276,7 +2277,7 @@ main_window::drop_type main_window::IsValidFile(const QMimeData& md, QStringList
 	{
 		const QString path = url.toLocalFile(); // convert url to filepath
 
-		const QFileInfo info = path;
+		const QFileInfo info(path);
 
 		// check for directories first, only valid if all other paths led to directories until now.
 		if (info.isDir())

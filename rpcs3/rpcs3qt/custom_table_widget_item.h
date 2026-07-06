@@ -30,7 +30,11 @@ public:
 
 	bool operator <(const QTableWidgetItem &other) const
 	{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+		return QVariant::compare(data(m_sort_role), other.data(m_sort_role)) == QPartialOrdering::Less;
+#else
 		return data(m_sort_role) < other.data(m_sort_role);
+#endif
 	}
 
 	void setData(int role, const QVariant &value, bool assign_sort_role)
